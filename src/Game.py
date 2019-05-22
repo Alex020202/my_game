@@ -29,7 +29,7 @@ class Game:
         self.textsurface = self.myfont.render('ГЕЙМ ОВЕР', False, (0, 0, 0))
         self.music = 1  # number of playing music
         self.isRunning = True  # if main cycle is going
-        self.Change_count = 0  # coordinates changing of objects' position
+        self.change_count = 0  # coordinates changing of objects' position
         self.Hero = Hero(self)
 
     def create_block(self):
@@ -41,6 +41,14 @@ class Game:
             self.Blocks_list.append(Block(random.randrange(320 - 40), self.y_loc, True, self))
         else:
             self.Blocks_list.append(Block(random.randrange(320 - 40), self.y_loc, False, self))
+
+    def touch_block(self):
+        for block in self.Blocks_list:
+            if (self.Hero.right_side >= block.x and self.Hero.x <= block.x_w) and self.Hero.next_legs_position >= block.y > self.Hero.legs_position:
+                self.Hero.push_off(block)
+                if block.сheck_del:
+                    self.Blocks_list.remove(block)
+                    self.create_block()
 
     def game_over(self):
         if self.music == 0:
@@ -84,15 +92,14 @@ class Game:
         self.win.blit(self.bottom, (0, 511))
         self.textsurface = self.myfont.render('Score: {}'.format(int(self.count)), False, (0, 0, 0))
         self.win.blit(self.textsurface, (0, 0))
-
         for block in self.Blocks_list:
             block.draw()
         self.Hero.draw()
-
         pygame.display.update()
 
     def run(self):
         while self.isRunning:
+
             self.clock.tick(30)
 
             for event in pygame.event.get():
@@ -108,7 +115,8 @@ class Game:
                 self.Hero.isJump = True
             else:
                 self.Hero.jump()
-            self.Hero.push_off()
+            self.Hero.change_variables()
+            self.touch_block()
             self.draw_win()
 
         self.isRunning = True
