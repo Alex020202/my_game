@@ -2,11 +2,11 @@ import pygame
 
 
 class Block:
-    def __init__(self, x, y, сheck_del, my_game):
+    def __init__(self, x, y, check_del, my_game):
         self.x = x
         self.y = y
         self.right_side = x + 30
-        self.сheck_del = сheck_del  # if block must be removed
+        self.сheck_del = check_del  # if block must be removed
         self.win = my_game.win
         self.my_game = my_game
         if not self.сheck_del:
