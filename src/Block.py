@@ -6,7 +6,7 @@ class Block:
         self.x = x
         self.y = y
         self.right_side = x + 30
-        self.сheck_del = check_del  # if block must be removed
+        self.check_del = check_del  # if block must be removed
         self.win = my_game.win
         self.my_game = my_game
         if not self.сheck_del:
