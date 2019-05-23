@@ -27,17 +27,17 @@ class Hero:
         self.right = False  # if character moves right
         self.win = my_game.win
         self.jump_height = 21  # height of jump: 1+2+3+4+..+x
-        self.isJump = False  # if character jumping
+        self.is_jump = False  # if character jumping
         self.velocity = self.jump_height  # position of jump
-        self.change_count = my_game.change_count
         self.my_game = my_game
-        self.right_side = self.x + self.width
+        self.right_side = self.x + self.width  # right side of hero
         self.next_legs_position = self.y - self.velocity + self.height
         self.legs_position = self.y + self.height
         self.next_y_position = self.y - self.velocity
+        self.move_details = 512 / 2 - 50  # line which character can't outstep
 
     def draw(self):
-        if self.isJump:
+        if self.is_jump:
             if self.left:
                 self.win.blit(self.jumpLeft[0], (self.x - 16, self.y))
             elif self.right:
@@ -73,32 +73,26 @@ class Hero:
             self.left = False
             self.right = False
         if keys[pygame.K_SPACE]:
-            self.isJump = True
-            self.velocity = self.jump_height + 10
+            self.is_jump = True
+            self.velocity = self.jump_height
 
-    def jump(self):
+    def objects_falling(self):
+        change = 0
         if self.next_legs_position < 512:
-            if self.next_y_position < self.my_game.move_details:
-                self.my_game.change_count = (self.my_game.move_details - (self.next_y_position - 1))
-                self.my_game.count += self.my_game.change_count
-
-                for block in self.my_game.Blocks_list:
-                    block.y += self.my_game.change_count
-                    if block.y > 512:
-                        self.my_game.Blocks_list.remove(block)
-                        self.my_game.create_block()
-
-                self.y = self.my_game.move_details
+            if self.next_y_position < self.move_details:
+                change = (self.move_details - (self.next_y_position - 1))
+                self.y = self.move_details
             else:
                 self.y = self.next_y_position
             self.velocity -= 1
         else:
             self.my_game.isRunning = False
+        return change
 
     def push_off(self, block):
         self.y = block.y - self.height
         self.velocity = self.jump_height
-        self.isJump = False
+        self.is_jump = False
 
     def change_variables(self):
         self.right_side = self.x + self.width

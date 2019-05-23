@@ -1,12 +1,11 @@
 import pygame
 import random
-from Block import *
-from Hero import *
+from Block import Block
+from Hero import Hero
 
 
 class Game:
     def __init__(self):
-        self.isJet = False  # if object of "jetpack" class is
         self.win = pygame.display.set_mode((320, 512 + 64))
 
         pygame.display.set_caption("Doodle Jump")
@@ -15,36 +14,34 @@ class Game:
         self.bottom = pygame.image.load("../assets/pictures/Bottom.png")
 
         self.y_loc = 450  # position of spawning blocks
-        self.r = 10  # Number of spawning blocks
-        self.Blocks_list = []
+        self.Blocks_list = []  # list of active blocks
         self.Blocks_list.append(Block(150, 501, False, self))
-        for i in range(1, self.r):
+        for i in range(10):
             self.Blocks_list.append(Block(random.randrange(320 - 40), self.y_loc, False, self))
             self.y_loc -= random.randrange(50, 150)
-        self.clock = pygame.time.Clock()
-        self.move_details = 512 / 2 - 50  # line which character can't outstep
-        self.count = 0  # player's score
+        self.clock = pygame.time.Clock()  # fps
+        self.score = 0  # player's score
         pygame.font.init()
-        self.myfont = pygame.font.SysFont('Comic Sans MS', 15)
-        self.textsurface = self.myfont.render('ГЕЙМ ОВЕР', False, (0, 0, 0))
+        self.myfont = pygame.font.SysFont('Comic Sans MS', 15)  # font
+        self.textsurface = self.myfont.render('ГЕЙМ ОВЕР', False, (0, 0, 0))  # first message
         self.music = 1  # number of playing music
         self.isRunning = True  # if main cycle is going
-        self.change_count = 0  # coordinates changing of objects' position
+        self.change_y_position = 0  # coordinates changing of objects' position
         self.Hero = Hero(self)
+        self.key = 0  # number of music
 
     def create_block(self):
-        self.y_loc = self.Blocks_list[len(self.Blocks_list) - 1].y - random.randrange(50,
-                                                                                      200)
-        if self.count // 1000 % 30 == 0 and self.count > 10000:
+        self.y_loc = self.Blocks_list[len(self.Blocks_list) - 1].y - random.randrange(50, 200)
+        if self.score // 1000 % 30 == 0 and self.score > 10000:
             self.Blocks_list.append(Block(random.randrange(320 - 40), self.y_loc, True, self))
-        elif random.randrange(30 - self.count // 1000 % 29) == 0:
+        elif random.randrange(30 - self.score // 1000 % 29) == 0:
             self.Blocks_list.append(Block(random.randrange(320 - 40), self.y_loc, True, self))
         else:
             self.Blocks_list.append(Block(random.randrange(320 - 40), self.y_loc, False, self))
 
     def touch_block(self):
         for block in self.Blocks_list:
-            if (self.Hero.right_side >= block.x and self.Hero.x <= block.x_w) and self.Hero.next_legs_position >= block.y > self.Hero.legs_position:
+            if (self.Hero.right_side >= block.x and self.Hero.x <= block.right_side) and self.Hero.next_legs_position >= block.y > self.Hero.legs_position:
                 self.Hero.push_off(block)
                 if block.сheck_del:
                     self.Blocks_list.remove(block)
@@ -57,12 +54,12 @@ class Game:
         self.win.blit(self.background, (0, 0))
         self.myfont = pygame.font.SysFont('Comic Sans MS', 20)
         self.win.blit(self.textsurface, (120, 100))
-        self.textsurface = self.myfont.render('ХА-ХА-ХА'.format(int(self.count)), False, (0, 0, 0))
+        self.textsurface = self.myfont.render('ХА-ХА-ХА'.format(int(self.score)), False, (0, 0, 0))
         self.win.blit(self.textsurface, (120, 200))
-        self.textsurface = self.myfont.render('ВЫ СЛИШКОМ ПЛОХО ИГРАЛИ!\n СЧЕТ:{}'.format(int(self.count)), False,
+        self.textsurface = self.myfont.render('ВЫ СЛИШКОМ ПЛОХО ИГРАЛИ!\n СЧЕТ:{}'.format(int(self.score)), False,
                                               (0, 0, 0))
         self.win.blit(self.textsurface, (0, 300))
-        self.textsurface = self.myfont.render('СЧЕТ:{}'.format(int(self.count)), False, (0, 0, 0))
+        self.textsurface = self.myfont.render('СЧЕТ:{}'.format(int(self.score)), False, (0, 0, 0))
         self.win.blit(self.textsurface, (120, 400))
 
     def play_music(self, key):
@@ -70,7 +67,6 @@ class Game:
             self.key = key % 5 + 1
         else:
             self.key = 0
-
         if self.key == 0 and self.music == 0:
             pygame.mixer.music.load("../assets/music/strashnye-zvuki-d-yavol-skiy-smeh.mp3")
         elif self.key == 1:
@@ -90,7 +86,7 @@ class Game:
         self.win.fill((0, 0, 0))
         self.win.blit(self.background, (0, 0))
         self.win.blit(self.bottom, (0, 511))
-        self.textsurface = self.myfont.render('Score: {}'.format(int(self.count)), False, (0, 0, 0))
+        self.textsurface = self.myfont.render('Score: {}'.format(int(self.score)), False, (0, 0, 0))
         self.win.blit(self.textsurface, (0, 0))
         for block in self.Blocks_list:
             block.draw()
@@ -99,9 +95,7 @@ class Game:
 
     def run(self):
         while self.isRunning:
-
             self.clock.tick(30)
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.isRunning = False
@@ -111,10 +105,17 @@ class Game:
                 self.play_music(self.music)
 
             self.Hero.move()
-            if not self.Hero.isJump:
-                self.Hero.isJump = True
+            if not self.Hero.is_jump:
+                self.Hero.is_jump = True
             else:
-                self.Hero.jump()
+                self.change_y_position = self.Hero.objects_falling()
+                self.score += self.change_y_position
+
+                for block in self.Blocks_list:
+                    block.y += self.change_y_position
+                    if block.y > 512:
+                        self.Blocks_list.remove(block)
+                        self.create_block()
             self.Hero.change_variables()
             self.touch_block()
             self.draw_win()
