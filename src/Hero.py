@@ -1,4 +1,5 @@
 import pygame
+from Jetpack import Jetpack
 
 
 class Hero:
@@ -35,6 +36,7 @@ class Hero:
         self.legs_position = self.y + self.height
         self.next_y_position = self.y - self.velocity
         self.move_details = 512 / 2 - 50  # line which character can't outstep
+        self.slot = "Empty"
 
     def draw(self):
         if self.is_jump:
@@ -78,15 +80,12 @@ class Hero:
 
     def objects_falling(self):
         change = 0
-        if self.next_legs_position < 512:
-            if self.next_y_position < self.move_details:
-                change = (self.move_details - (self.next_y_position - 1))
-                self.y = self.move_details
-            else:
-                self.y = self.next_y_position
-            self.velocity -= 1
+        if self.next_y_position < self.move_details:
+            change = (self.move_details - self.next_y_position + 1)
+            self.y = self.move_details
         else:
-            self.my_game.isRunning = False
+            self.y = self.next_y_position
+        self.velocity -= 1
         return change
 
     def push_off(self, block):
@@ -99,3 +98,7 @@ class Hero:
         self.next_legs_position = self.y - self.velocity + self.height
         self.legs_position = self.y + self.height
         self.next_y_position = self.y - self.velocity
+
+    def draw_slot(self):
+        if self.slot == "Jetpack":
+            self.my_game.Jetpack.draw()

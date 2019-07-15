@@ -2,6 +2,7 @@ import pygame
 import random
 from Block import Block
 from Hero import Hero
+from Jetpack import *
 
 
 class Game:
@@ -29,6 +30,10 @@ class Game:
         self.change_y_position = 0  # coordinates changing of objects' position
         self.Hero = Hero(self)
         self.key = 0  # number of music
+        self.jetpack_flag = False
+        self.jetpack_begin = None
+        self.is_jet_on_block = False
+        self.Jetpack = None
 
     def create_block(self):
         self.y_loc = self.Blocks_list[len(self.Blocks_list) - 1].y - random.randrange(50, 200)
@@ -41,9 +46,10 @@ class Game:
 
     def touch_block(self):
         for block in self.Blocks_list:
-            if (self.Hero.right_side >= block.x and self.Hero.x <= block.right_side) and self.Hero.next_legs_position >= block.y > self.Hero.legs_position:
+            if (self.Hero.right_side >= block.x and self.Hero.x <= block.right_side) and self.Hero.next_legs_position\
+                    >= block.y > self.Hero.legs_position:
                 self.Hero.push_off(block)
-                if block.сheck_del:
+                if block.check_del:
                     self.Blocks_list.remove(block)
                     self.create_block()
 
@@ -91,14 +97,38 @@ class Game:
         for block in self.Blocks_list:
             block.draw()
         self.Hero.draw()
+        self.Hero.draw_slot()
+        if self.is_jet_on_block:
+            self.Jetpack.catch_jetpack()
         pygame.display.update()
 
     def run(self):
         while self.isRunning:
-            self.clock.tick(30)
+            if 40000 >= self.score >= 10000:
+                self.clock.tick(30 + self.score // 1000 - 10)
+            elif self.score > 40000:
+                self.clock.tick(60)
+            else:
+                self.clock.tick(30)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.isRunning = False
+
+            if 0 < self.score < 50 and not self.is_jet_on_block:
+                self.is_jet_on_block = True
+                self.Jetpack = Jetpack(self)
+            if self.is_jet_on_block and (
+                    self.Jetpack.y < self.Hero.y < self.Jetpack.y + 36 or self.Jetpack.y < self.Hero.y + self.Hero.height < self.Jetpack.y + 36) and (
+                    self.Hero.x + self.Hero.width > self.Jetpack.x > self.Hero.x or self.Hero.x < self.Jetpack.x + 26 < self.Hero.x + self.Hero.width):
+                self.Hero.slot = "Jetpack"
+                self.is_jet_on_block = False
+                self.jetpack_flag = True
+                self.Jetpack.jetpack_begin = self.score
+            if self.jetpack_flag:
+                self.Hero.is_jump = True
+                self.Hero.velocity = self.Hero.jump_height + 5
+                self.Jetpack.counting_position()
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP]:
@@ -108,14 +138,24 @@ class Game:
             if not self.Hero.is_jump:
                 self.Hero.is_jump = True
             else:
-                self.change_y_position = self.Hero.objects_falling()
-                self.score += self.change_y_position
+                if self.Hero.next_legs_position < 512:
+                    self.change_y_position = self.Hero.objects_falling()
+                    self.score += self.change_y_position
+                else:
+                    self.isRunning = False
+                if self.is_jet_on_block:
+                    self.Jetpack.y += self.change_y_position
+                    if self.Jetpack.y > 512:
+                        self.is_jet_on_block = False
+                        self.Jetpack = "Deleted"
 
                 for block in self.Blocks_list:
                     block.y += self.change_y_position
                     if block.y > 512:
                         self.Blocks_list.remove(block)
                         self.create_block()
+            if self.Jetpack is not None and not self.jetpack_flag and not self.is_jet_on_block:
+                self.Jetpack = None
             self.Hero.change_variables()
             self.touch_block()
             self.draw_win()
