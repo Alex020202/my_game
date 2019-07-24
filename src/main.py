@@ -4,7 +4,6 @@ pygame.init()
 
 
 def main():
-    global my_game
     my_game = Game()
     my_game.run()
 

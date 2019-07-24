@@ -27,7 +27,7 @@ class Hero:
         self.left = False  # if character moves left
         self.right = False  # if character moves right
         self.win = my_game.win
-        self.jump_height = 21  # height of jump: 1+2+3+4+..+x
+        self.jump_height = 20  # height of jump: 1+2+3+4+..+x
         self.is_jump = False  # if character jumping
         self.velocity = self.jump_height  # position of jump
         self.my_game = my_game
@@ -81,7 +81,7 @@ class Hero:
     def objects_falling(self):
         change = 0
         if self.next_y_position < self.move_details:
-            change = (self.move_details - self.next_y_position + 1)
+            change = self.move_details - self.next_y_position + 1
             self.y = self.move_details
         else:
             self.y = self.next_y_position

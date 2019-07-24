@@ -5,7 +5,7 @@ class Block:
     def __init__(self, x, y, check_del, my_game):
         self.x = x
         self.y = y
-        self.right_side = x + 30
+        self.right_side = x + 40
         self.check_del = check_del  # if block must be removed
         self.win = my_game.win
         self.my_game = my_game
