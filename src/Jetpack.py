@@ -29,6 +29,7 @@ class Jetpack:
         self.left_fall = False
         self.animcount = 0
         self.jetpack_animation_velocity = self.my_game.FPS / 30 * 2
+        self.jetpack_animation_position = None
 
         for number in range(10):
             self.jetpackLeft_1.append(
@@ -47,39 +48,40 @@ class Jetpack:
         self.jetpackCatch = pygame.image.load("../assets/pictures/Catch_Jetpack.png")
 
     def counting_position(self):
-        if 0 <= (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 200:
+        self.jetpack_animation_position = (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity
+        if 0 <= self.jetpack_animation_position < 200:
             self.position = 0
             self.Hero.velocity = self.Hero.jump_height - 5
-        elif 200 <= (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 400:
+        elif 200 <= self.jetpack_animation_position < 400:
             self.position = 1
             self.Hero.velocity = self.Hero.jump_height - 3
-        elif 400 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 600:
+        elif 400 < self.jetpack_animation_position < 600:
             self.position = 2
             self.Hero.velocity = self.Hero.jump_height - 1
-        elif 600 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 800:
+        elif 600 < self.jetpack_animation_position < 800:
             self.position = 3
             self.Hero.velocity = self.Hero.jump_height + 1
-        elif 800 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 1000:
+        elif 800 < self.jetpack_animation_position < 1000:
             self.position = 4
             self.Hero.velocity = self.Hero.jump_height + 3
-        elif 1000 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 1200:
+        elif 1000 < self.jetpack_animation_position < 1200:
             self.position = 5
             self.Hero.velocity = self.Hero.jump_height + 5
-        elif 1200 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 1400:
+        elif 1200 < self.jetpack_animation_position < 1400:
             self.position = 6
-            self.Hero.velocity = self.Hero.jump_height + 3
-        elif 1400 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 1600:
+            self.Hero.velocity = self.Hero.jump_height + 8
+        elif 1400 < self.jetpack_animation_position < 1600:
             self.position = 7
-            self.Hero.velocity = self.Hero.jump_height + 1
-        elif 1600 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 1800:
+            self.Hero.velocity = self.Hero.jump_height + 11
+        elif 1600 < self.jetpack_animation_position < 1800:
             self.position = 8
-            self.Hero.velocity = self.Hero.jump_height - 1
-        elif 1800 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity < 2000:
+            self.Hero.velocity = self.Hero.jump_height + 14
+        elif 1800 < self.jetpack_animation_position < 2000:
             self.position = 9
-            self.Hero.velocity = self.Hero.jump_height - 3
-        elif 2000 < (self.my_game.score - self.jetpack_begin) / self.jetpack_animation_velocity :
+            self.Hero.velocity = self.Hero.jump_height + 10
+        elif 2000 < self.jetpack_animation_position:
             self.position += 1
-            self.Hero.velocity = self.Hero.jump_height - 5
+            self.Hero.velocity = self.Hero.jump_height + 6
             if self.position == 10:
                 self.x_fall = self.Hero.x
                 self.y_fall = self.Hero.y

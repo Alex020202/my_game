@@ -36,7 +36,7 @@ class Hero:
         self.legs_position = self.y + self.height
         self.next_y_position = self.y - self.velocity
         self.move_details = 512 / 2 - 50  # line which character can't outstep
-        self.slot = "Empty"
+        self.slot = None
 
     def draw(self):
         if self.is_jump:
@@ -100,5 +100,5 @@ class Hero:
         self.next_y_position = self.y - self.velocity
 
     def draw_slot(self):
-        if self.slot == "Jetpack":
-            self.my_game.Jetpack.draw()
+        if self.slot is not None and self.slot == self.my_game.Jetpack:
+            self.slot.draw()

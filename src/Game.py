@@ -290,6 +290,51 @@ class Game:
                 else:
                     self.new_score += event.unicode
 
+    def changing_difficulty(self):
+        if 40000 >= self.score >= 10000:
+            self.FPS = 30 + self.score // 1000 - 10
+        elif self.score > 40000:
+            self.FPS = 60
+        else:
+            self.FPS = 30
+
+    def spawning_jetpack(self):
+        if 0 < self.score % 1000 < 50 < self.score and not self.is_jet_on_block and self.Hero.slot is None:
+            self.is_jet_on_block = True
+            self.Jetpack = Jetpack(self)
+
+    def catching_jetpack(self):
+        if self.is_jet_on_block and (
+                self.Jetpack.y < self.Hero.y < self.Jetpack.y + 36 or self.Jetpack.y < self.Hero.y + self.Hero.height < self.Jetpack.y + 36) and (
+                self.Hero.x + self.Hero.width > self.Jetpack.x > self.Hero.x or self.Hero.x < self.Jetpack.x + 26 < self.Hero.x + self.Hero.width):
+            self.Hero.slot = self.Jetpack
+            self.is_jet_on_block = False
+            self.jetpack_flag = True
+            self.Jetpack.jetpack_begin = self.score
+
+    def changing_coordinates(self):
+        if not self.Hero.is_jump:
+            self.Hero.is_jump = True
+        else:
+            if self.Hero.next_legs_position < self.win_height:
+                self.change_y_position = self.Hero.objects_falling()
+                self.score += self.change_y_position
+            else:
+                self.game_stage = "game over"
+                self.music = 0
+
+            if self.is_jet_on_block:
+                self.Jetpack.y += self.change_y_position
+                if self.Jetpack.y > self.win_height:
+                    self.is_jet_on_block = False
+                    self.Jetpack = None
+
+            for block in self.Blocks_list:
+                block.y += self.change_y_position
+                if block.y > self.win_height:
+                    self.Blocks_list.remove(block)
+                    self.create_block()
+
     def run(self):
         while self.is_running:
             if self.game_stage == "main menu":
@@ -299,12 +344,7 @@ class Game:
                 self.scores()
 
             elif self.game_stage == "play":
-                if 40000 >= self.score >= 10000:
-                    self.FPS = 30 + self.score // 1000 - 10
-                elif self.score > 40000:
-                    self.FPS = 60
-                else:
-                    self.FPS = 30
+                self.changing_difficulty()
                 self.clock.tick(self.FPS)
 
                 for event in pygame.event.get():
@@ -314,48 +354,17 @@ class Game:
                         if event.key == pygame.K_UP:
                             self.play_music(self.music)
 
-                if 0 < self.score % 20000 < 50 < self.score and not self.is_jet_on_block:
-                    self.is_jet_on_block = True
-                    self.Jetpack = Jetpack(self)
-
-                if self.is_jet_on_block and (
-                        self.Jetpack.y < self.Hero.y < self.Jetpack.y + 36 or self.Jetpack.y < self.Hero.y + self.Hero.height < self.Jetpack.y + 36) and (
-                        self.Hero.x + self.Hero.width > self.Jetpack.x > self.Hero.x or self.Hero.x < self.Jetpack.x + 26 < self.Hero.x + self.Hero.width):
-                    self.Hero.slot = "Jetpack"
-                    self.is_jet_on_block = False
-                    self.jetpack_flag = True
-                    self.Jetpack.jetpack_begin = self.score
-
+                self.spawning_jetpack()
+                self.catching_jetpack()
                 if self.jetpack_flag:
-                    self.Hero.is_jump = True
-
                     self.Jetpack.counting_position()
+                if self.Jetpack is not None and not self.jetpack_flag and not self.is_jet_on_block:
+                    self.Jetpack = None
 
                 self.Hero.move()
 
-                if not self.Hero.is_jump:
-                    self.Hero.is_jump = True
-                else:
-                    if self.Hero.next_legs_position < self.win_height:
-                        self.change_y_position = self.Hero.objects_falling()
-                        self.score += self.change_y_position
-                    else:
-                        self.game_stage = "game over"
-                        self.music = 0
+                self.changing_coordinates()
 
-                    if self.is_jet_on_block:
-                        self.Jetpack.y += self.change_y_position
-                        if self.Jetpack.y > self.win_height:
-                            self.is_jet_on_block = False
-                            self.Jetpack = "Deleted"
-
-                    for block in self.Blocks_list:
-                        block.y += self.change_y_position
-                        if block.y > self.win_height:
-                            self.Blocks_list.remove(block)
-                            self.create_block()
-                if self.Jetpack is not None and not self.jetpack_flag and not self.is_jet_on_block:
-                    self.Jetpack = None
                 self.Hero.change_variables()
                 self.touch_block()
                 self.draw_win()
