@@ -30,7 +30,6 @@ class Hero:
         self.jump_height = 20  # height of jump: 1+2+3+4+..+x
         self.is_jump = False  # if character jumping
         self.velocity = self.jump_height  # position of jump
-        self.my_game = my_game
         self.right_side = self.x + self.width  # right side of hero
         self.next_legs_position = self.y - self.velocity + self.height
         self.legs_position = self.y + self.height
@@ -100,5 +99,5 @@ class Hero:
         self.next_y_position = self.y - self.velocity
 
     def draw_slot(self):
-        if self.slot is not None and self.slot == self.my_game.Jetpack:
+        if self.slot is not None:
             self.slot.draw()

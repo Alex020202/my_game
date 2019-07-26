@@ -299,7 +299,7 @@ class Game:
             self.FPS = 30
 
     def spawning_jetpack(self):
-        if 0 < self.score % 1000 < 50 < self.score and not self.is_jet_on_block and self.Hero.slot is None:
+        if 0 < self.score % 20000 < 50 < self.score and not self.is_jet_on_block and self.Hero.slot is None:
             self.is_jet_on_block = True
             self.Jetpack = Jetpack(self)
 
