@@ -30,10 +30,7 @@ class Hero:
         self.jump_height = 20  # height of jump: 1+2+3+4+..+x
         self.is_jump = False  # if character jumping
         self.velocity = self.jump_height  # position of jump
-        self.right_side = self.x + self.width  # right side of hero
-        self.next_legs_position = self.y - self.velocity + self.height
-        self.legs_position = self.y + self.height
-        self.next_y_position = self.y - self.velocity
+        self.change_variables()
         self.move_details = 512 / 2 - 50  # line which character can't outstep
         self.slot = None
 
